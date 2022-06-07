@@ -2,7 +2,6 @@
 package com.jrj.pruebatecnica.services.jpa;
 
 import com.jrj.pruebatecnica.entities.Prendas;
-import com.jrj.pruebatecnica.entities.Promociones;
 import com.jrj.pruebatecnica.repositories.PrendasRepository;
 import com.jrj.pruebatecnica.services.PrendasService;
 import java.util.List;
@@ -53,19 +52,5 @@ public class PrendasServiceJpaImpl implements PrendasService{
             return null;
         }
     }
-
-    @Override
-    public Prendas applyPromo(Prendas prenda, Promociones promo) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Prendas unapplyPromo(Prendas prenda, Promociones promo) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-   
-    
-    
     
 }

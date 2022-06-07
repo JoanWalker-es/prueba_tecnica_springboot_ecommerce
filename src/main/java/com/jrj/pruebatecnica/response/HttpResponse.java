@@ -2,13 +2,13 @@
 package com.jrj.pruebatecnica.response;
 
 
-public class PrendaResponse {
+public class HttpResponse {
     private String info;
 
-    public PrendaResponse() {
+    public HttpResponse() {
     }
 
-    public PrendaResponse(String info) {
+    public HttpResponse(String info) {
         this.info = info;
     }
 

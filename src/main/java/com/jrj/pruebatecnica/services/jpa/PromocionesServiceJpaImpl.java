@@ -1,7 +1,7 @@
-
 package com.jrj.pruebatecnica.services.jpa;
 
 import com.jrj.pruebatecnica.entities.Promociones;
+import com.jrj.pruebatecnica.repositories.PrendasRepository;
 import com.jrj.pruebatecnica.repositories.PromocionesRepository;
 import com.jrj.pruebatecnica.services.PromocionesService;
 import java.util.Optional;
@@ -13,38 +13,39 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public class PromocionesServiceJpaImpl implements PromocionesService{
-    
-    private static Logger logger=LoggerFactory.getLogger(PromocionesServiceJpaImpl.class);
-    
+public class PromocionesServiceJpaImpl implements PromocionesService {
+
+    private static Logger logger = LoggerFactory.getLogger(PromocionesServiceJpaImpl.class);
+
     @Autowired
-    private PromocionesRepository pr;
+    private PromocionesRepository promoRepo;
+
+    @Autowired
+    private PrendasRepository prendasRepo;
 
     @Override
     public Promociones add(Promociones promo) {
         logger.info(("Creating promo"));
-        return pr.save(promo);
+        return promoRepo.save(promo);
     }
 
     @Override
     public void delete(String nombre) {
         logger.info(("Deleting promo"));
-        pr.deleteById(nombre);
+        promoRepo.deleteById(nombre);
     }
 
     @Override
     public Promociones findByName(String nombre) {
         logger.info("Buscando una promo");
-        Optional<Promociones> promo=pr.findById(nombre);
-        if(promo.isPresent()){
+        Optional<Promociones> promo = promoRepo.findById(nombre);
+        if (promo.isPresent()) {
             logger.info("Found Promocion");
             return promo.get();
-        }else{
+        } else {
             logger.info("NOT Found promocion");
             return null;
         }
     }
-    
-    
-    
+
 }

@@ -2,7 +2,7 @@ package com.jrj.pruebatecnica.Controllers;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.jrj.pruebatecnica.entities.Prendas;
-import com.jrj.pruebatecnica.response.PrendaResponse;
+import com.jrj.pruebatecnica.response.HttpResponse;
 import com.jrj.pruebatecnica.services.PrendasService;
 import com.jrj.pruebatecnica.services.PromocionesService;
 import io.swagger.annotations.ApiOperation;
@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,16 +36,9 @@ public class PrendasController {
     private static final Logger logger = LoggerFactory.getLogger(PrendasController.class);
 
     @Autowired
-    private PrendasService prendasService;
+    private PrendasService prendasService;   
 
-    @Autowired
-    private PromocionesService promoService;
 
-//    @ApiOperation(value = "Crea una nueva prenda", notes = "Devuelve la prenda creada con su precio promocional")
-//    @ApiResponses(value = {
-//        @ApiResponse(description = "code = 200, message = Created - The product was created"),
-//        @ApiResponse(description= "code = 404, message = Not found - The product was not found")
-//    })
 //    @Operation(summary = "Crea una nueva prenda", description = "Devuelve la prenda creada con su precio promocional", responses = {
 //        @ApiResponse(responseCode = "200", description = "Successful operation"),
 //        @ApiResponse(responseCode = "400", description = "Invalid data"),
@@ -67,19 +61,18 @@ public class PrendasController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(newPrenda);
             } else {
                 logger.info("PRENDA NO CREADA " + HttpStatus.BAD_REQUEST.value());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new PrendaResponse("PRENDA NO CREADA"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponse("PRENDA NO CREADA"));
             }
         } else {
             logger.info("PRENDA NO CREADA ERROR REFERENCIA " + HttpStatus.BAD_REQUEST.value());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new PrendaResponse("LA REF DE LA PRENDA DEBE COMENZAR POR S,M,L Y TENER UNA LONGITUD MÁXIMA DE 10 CARACTERES "));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponse("LA REF DE LA PRENDA DEBE COMENZAR POR S,M,L Y TENER UNA LONGITUD MÁXIMA DE 10 CARACTERES "));
         }
     }
 
     @ExceptionHandler({InvalidFormatException.class})
     public ResponseEntity<?> capturExceptionCategoria(InvalidFormatException ex) {
         logger.info("ERROR EN LA RECEPCION DE LA CATEGORIA " + HttpStatus.BAD_REQUEST.value());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new PrendaResponse("EL VALOR DE CATEGORIA NO COINCIDE CON NINGUNO DE LOS ACEPTADOS"));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponse("EL VALOR DE CATEGORIA NO COINCIDE CON NINGUNO DE LOS ACEPTADOS"));
     }
 
     @DeleteMapping(value = "/{referencia}")
@@ -90,10 +83,10 @@ public class PrendasController {
         if (prenda != null) {
             prendasService.delete(referencia);
             logger.info("PRENDA BORRADA " + HttpStatus.NO_CONTENT.value());
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new PrendaResponse("PRENDA ELIMINADA CORRECTAMENTE"));
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new HttpResponse("PRENDA ELIMINADA CORRECTAMENTE"));
         } else {
             logger.info("ERROR PRENDA NO ENCONTRADA");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new PrendaResponse("PRENDA NO ENCONTRADA " + HttpStatus.NOT_FOUND.value()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HttpResponse("PRENDA NO ENCONTRADA " + HttpStatus.NOT_FOUND.value()));
         }
     }
 
@@ -114,14 +107,21 @@ public class PrendasController {
             return ResponseEntity.status(HttpStatus.OK).body(prenda);
         } else {
             logger.info("PRENDA NO ENCONTRADA " + HttpStatus.NOT_FOUND.value());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new PrendaResponse("PRENDA NO ENCONTRADA"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HttpResponse("PRENDA NO ENCONTRADA"));
         }
     }
 
     private double formato(double precio) {
-        BigDecimal bd = new BigDecimal(precio);
-        bd = bd.setScale(2, RoundingMode.HALF_UP);
-        return bd.doubleValue();        
+//        BigDecimal bd = new BigDecimal(precio);
+//        bd = bd.setScale(2, RoundingMode.HALF_UP);
+//        return bd.doubleValue();  
+        logger.info("DENTRO DEL FORMATER PRECIO");
+        DecimalFormat df = new DecimalFormat("0.00");
+        String prec=df.format(precio);
+        String precSin=prec.replace(",",".");
+        logger.info(precSin);
+        double precioFormateado = Double.valueOf(precSin);
+        return precioFormateado;
     }
 
 }

@@ -2,11 +2,9 @@ package com.jrj.pruebatecnica.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.OptionalInt;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,7 +18,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 @Entity
-@JsonPropertyOrder({"referencia", "precio","categorias"})
 public class Prendas implements Serializable {
 
     @Id    
