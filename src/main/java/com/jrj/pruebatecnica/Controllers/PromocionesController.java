@@ -44,7 +44,7 @@ public class PromocionesController {
     @Autowired
     private PrendasService prendaService;
 
-    @ApiOperation(value = "Crea una nueva promocion")
+    @ApiOperation(value = "Crea una nueva promocion",notes = "Crea una nueva promoción con su nombre y descuento.")
     @ApiResponses(value = {
         @ApiResponse(code = 201, response = HttpResponse.class, message = "Promocion creada correctamente"),
         @ApiResponse(code = 400, response = HttpResponse.class, message = "Promocion no creada, datos mal formados")})
@@ -71,7 +71,7 @@ public class PromocionesController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponse("DESCUENTO DE LA PROMOCION MAL FORMADO"));
     }
 
-    @ApiOperation(value = "Elimina una promocion")
+    @ApiOperation(value = "Elimina una promocion",notes = "Elimina una promoción y la desaplica automáticamente a todas las prendas asociadas.")
     @ApiResponses(value = {
         @ApiResponse(code = 204, response = HttpResponse.class, message = "Promocion eliminada"),
         @ApiResponse(code = 404, response = HttpResponse.class, message = "Promocion no encontrada")})
@@ -95,7 +95,7 @@ public class PromocionesController {
         }
     }
 
-    @ApiOperation(value = "Aplica una promocion a una prenda")
+    @ApiOperation(value = "Aplica una promocion a una prenda",notes = "Aplica una promoción a una prenda y recalcula el precio promocional de esta.")
     @ApiResponses(value = {
         @ApiResponse(code = 202, response = HttpResponse.class, message = "Promocion aplicada a la prenda"),
         @ApiResponse(code = 404, response = HttpResponse.class, message = "Prenda/promocion no encontrada")})
@@ -123,7 +123,7 @@ public class PromocionesController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HttpResponse("PRENDA NO ENCONTRADA"));
     }
 
-    @ApiOperation(value = "Desaplica una promocion a una prenda")
+    @ApiOperation(value = "Desaplica una promocion a una prenda",notes = "Desaplica una promoción de una prenda y recalcula el precio promocional de la prenda.")
     @ApiResponses(value = {
         @ApiResponse(code = 202, response = HttpResponse.class, message = "Promocion desaplicada a la prenda"),
         @ApiResponse(code = 404, response = HttpResponse.class, message = "Prenda/promocion no encontrada")})
@@ -168,18 +168,5 @@ public class PromocionesController {
         BigDecimal bd = new BigDecimal(precio);
         bd = bd.setScale(2, RoundingMode.HALF_UP);
         return bd.doubleValue();
-
-//        DecimalFormat df = new DecimalFormat("0.00");
-//        String prec=df.format(precio);
-//        String precSin=prec.replace(",",".");
-//        logger.info(precSin);
-//        double precioFormateado = Double.valueOf(precSin);
-//        return precioFormateado;
-        
-        
-//        Double format = Math.round(precio*100.00)/100.00;
-//        return format;
-
-
     }
 }

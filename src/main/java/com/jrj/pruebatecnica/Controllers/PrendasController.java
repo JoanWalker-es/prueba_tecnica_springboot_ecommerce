@@ -36,7 +36,7 @@ public class PrendasController {
     @Autowired
     private PrendasService prendasService;
 
-    @ApiOperation(value = "Crea una nueva prenda")
+    @ApiOperation(value = "Crea una nueva prenda",notes = "Crea una nueva prenda con su referencia, precio y categorias asociadas.")
     @ApiResponses(value = {
         @ApiResponse(code = 201, response = HttpResponse.class, message = "Prenda creada correctamente"),
         @ApiResponse(code = 400, response = HttpResponse.class, message = "Prenda no creada, datos mal formados")})
@@ -48,7 +48,7 @@ public class PrendasController {
         Matcher mat = pat.matcher(prenda.getReferencia());
         if (mat.matches()) {
             logger.info("REF OK");
-            prenda.setPrecio(formato(prenda.getPrecio()));
+            prenda.setPrecio(prenda.getPrecio());
             prenda.setPrecio_promocionado(prenda.getPrecio());
             Prendas newPrenda = prendasService.add(prenda);
             if (newPrenda != null) {
@@ -71,7 +71,7 @@ public class PrendasController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponse("EL VALOR DE CATEGORIA NO COINCIDE CON NINGUNO DE LOS ACEPTADOS"));
     }
 
-    @ApiOperation(value = "Elimina una prenda")
+    @ApiOperation(value = "Elimina una prenda",notes = "Elimina una prenda indicando la referencia.")
     @ApiResponses(value = {
         @ApiResponse(code = 204, response = HttpResponse.class, message = "Prenda eliminada"),
         @ApiResponse(code = 404, response = HttpResponse.class, message = "Prenda no encontrada")})
@@ -89,7 +89,7 @@ public class PrendasController {
         }
     }
 
-    @ApiOperation(value = "Encuentra todas las prendas")
+    @ApiOperation(value = "Encuentra todas las prendas",notes = "Recupera todas las prendas.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, response = HttpResponse.class, message = "Prendas recuperadas")})
     @GetMapping(value = "")    
@@ -99,7 +99,7 @@ public class PrendasController {
         return ResponseEntity.status(HttpStatus.OK).body(prendas);
     }
 
-    @ApiOperation(value = "Recupera una prenda por referencia")
+    @ApiOperation(value = "Recupera una prenda por referencia",notes = "Recupera una prenda indicando la referencia de esta.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, response = HttpResponse.class, message = "Prenda recuperada"),
         @ApiResponse(code = 404, response = HttpResponse.class, message = "Prenda no encontrada")})
@@ -118,14 +118,7 @@ public class PrendasController {
     private double formato(double precio) {
         BigDecimal bd = new BigDecimal(precio);
         bd = bd.setScale(2, RoundingMode.HALF_UP);
-        return bd.doubleValue();  
-//        logger.info("DENTRO DEL FORMATER PRECIO");
-//        DecimalFormat df = new DecimalFormat("0.00");
-//        String prec = df.format(precio);
-//        String precSin = prec.replace(",", ".");
-//        logger.info(precSin);
-//        double precioFormateado = Double.valueOf(precSin);
-//        return precioFormateado;
+        return bd.doubleValue();
     }
 
 }

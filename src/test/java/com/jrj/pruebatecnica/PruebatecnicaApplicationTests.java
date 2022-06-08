@@ -22,6 +22,7 @@ class PruebatecnicaApplicationTests {
 
     @Test
     void contextLoads() {
+
     }
 
 }

@@ -1,9 +1,11 @@
 package com.jrj.pruebatecnica.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -23,9 +25,9 @@ public class Prendas implements Serializable {
     @Id    
     @ApiModelProperty(notes = "Referencia de la prenda", example = "S123456789", required = true)     
     private String referencia;
-    @ApiModelProperty(notes = "Precio de la prenda", example = "0.00", required = true)
-    private double precio; 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)    
+    @ApiModelProperty(notes = "Precio de la prenda", example = "10.15", required = true)
+    private double precio;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private double precio_promocionado;
 
     @Column(name = "Categorias")
@@ -64,6 +66,7 @@ public class Prendas implements Serializable {
     }
 
     public double getPrecio() {
+
         return precio;
     }
 
@@ -72,6 +75,7 @@ public class Prendas implements Serializable {
     }
 
     public double getPrecio_promocionado() {
+
         return precio_promocionado;
     }
     
