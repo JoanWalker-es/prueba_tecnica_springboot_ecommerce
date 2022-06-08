@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,7 +60,13 @@ public class PromocionesController {
     }
 
     @ExceptionHandler({InvalidFormatException.class})
-    public ResponseEntity<?> capturExceptionCategoria(InvalidFormatException ex) {
+    public ResponseEntity<?> capturExceptionDescuento(InvalidFormatException ex) {
+        logger.info("ERROR EN LA RECEPCION DE LA PROMOCION " + HttpStatus.BAD_REQUEST.value());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponse("DESCUENTO DE LA PROMOCION MAL FORMADO"));
+    }
+    
+    @ExceptionHandler({HttpMessageNotReadableException.class})
+    public ResponseEntity<?> capturExceptionDescuentoNumero(HttpMessageNotReadableException ex) {
         logger.info("ERROR EN LA RECEPCION DE LA PROMOCION " + HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponse("DESCUENTO DE LA PROMOCION MAL FORMADO"));
     }
@@ -82,9 +89,9 @@ public class PromocionesController {
                 }
             }
             promoService.delete(nombre);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(new HttpResponse("PROMOCION ELIMINADA"));
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new HttpResponse("PROMOCION ELIMINADA"));
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new HttpResponse("PROMOCION NO EXISTE"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HttpResponse("PROMOCION NO EXISTE"));
         }
     }
 
@@ -157,9 +164,9 @@ public class PromocionesController {
     }
 
     private double formato(double precio) {
-//        BigDecimal bd = new BigDecimal(precio);
-//        bd = bd.setScale(2, RoundingMode.HALF_UP);
-//        return bd.doubleValue();
+        BigDecimal bd = new BigDecimal(precio);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
 
 //        DecimalFormat df = new DecimalFormat("0.00");
 //        String prec=df.format(precio);
@@ -169,8 +176,8 @@ public class PromocionesController {
 //        return precioFormateado;
         
         
-        Double format = Math.round(precio*100.0)/100.0;
-        return format;
+//        Double format = Math.round(precio*100.00)/100.00;
+//        return format;
 
 
     }
