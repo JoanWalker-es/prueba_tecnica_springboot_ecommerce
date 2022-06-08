@@ -146,15 +146,15 @@ public class PromocionesController {
     }
 
     private double formato(double precio) {
-//        BigDecimal bd = new BigDecimal(precio);
-//        bd = bd.setScale(2, RoundingMode.HALF_UP);
-//        return bd.doubleValue();
+        BigDecimal bd = new BigDecimal(precio);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
         
-        DecimalFormat df = new DecimalFormat("0.00");
-        String prec=df.format(precio);
-        String precSin=prec.replace(",",".");
-        logger.info(precSin);
-        double precioFormateado = Double.valueOf(precSin);
-        return precioFormateado;
+//        DecimalFormat df = new DecimalFormat("0.00");
+//        String prec=df.format(precio);
+//        String precSin=prec.replace(",",".");
+//        logger.info(precSin);
+//        double precioFormateado = Double.valueOf(precSin);
+//        return precioFormateado;
     }
 }
