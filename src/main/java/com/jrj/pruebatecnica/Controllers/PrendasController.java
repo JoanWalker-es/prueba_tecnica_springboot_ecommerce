@@ -47,12 +47,10 @@ public class PrendasController {
         Pattern pat = Pattern.compile("^[S,M,L]{1}[a-zA-Z0-9]{9}");
         Matcher mat = pat.matcher(prenda.getReferencia());
         if (mat.matches()) {
-            logger.info("REF OK");
             prenda.setPrecio(prenda.getPrecio());
             prenda.setPrecio_promocionado(prenda.getPrecio());
             Prendas newPrenda = prendasService.add(prenda);
             if (newPrenda != null) {
-                logger.info((newPrenda.toString()));
                 logger.info("PRENDA CREADA " + HttpStatus.CREATED.value());
                 return ResponseEntity.status(HttpStatus.CREATED).body(newPrenda);
             } else {
