@@ -1,6 +1,7 @@
 package com.jrj.pruebatecnica.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +13,9 @@ import javax.persistence.ManyToMany;
 public class Promociones implements Serializable{
 
     @Id
+    @ApiModelProperty(notes = "Nombre de la promocion", example = "BLACK FRIDAY", required = true)
     private String nombre;
+    @ApiModelProperty(notes = "Descuento de la promocion", example = "10.00", required = true)
     private double descuento;
 
     @JsonIgnore

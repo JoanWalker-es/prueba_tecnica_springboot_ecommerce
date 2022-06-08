@@ -13,7 +13,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,16 +48,16 @@ public class PromocionesController {
         @ApiResponse(code = 201, response = HttpResponse.class, message = "Promocion creada correctamente"),
         @ApiResponse(code = 400, response = HttpResponse.class, message = "Promocion no creada, datos mal formados")})
     @PostMapping(value = "")
-    public ResponseEntity<Promociones> add(@RequestBody Promociones promo) {     
+    public ResponseEntity<Promociones> add(@RequestBody Promociones promo) {
         logger.info("CREANDO PROMO");
         Promociones promos = promoService.add(promo);
-        if (promos != null) {            
+        if (promos != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(promos);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
-    
+
     @ExceptionHandler({InvalidFormatException.class})
     public ResponseEntity<?> capturExceptionCategoria(InvalidFormatException ex) {
         logger.info("ERROR EN LA RECEPCION DE LA PROMOCION " + HttpStatus.BAD_REQUEST.value());
@@ -74,9 +76,9 @@ public class PromocionesController {
             List<Prendas> prendas = prendaService.findAll();
             for (Prendas p : prendas) {
                 if (p.getPromocionesDePrendas().contains(promo)) {
-                    p.getPromocionesDePrendas().remove(promo);                    
+                    p.getPromocionesDePrendas().remove(promo);
                     p.setPrecio_promocionado(calculaPromos(p));
-                    Prendas newPrenda = prendaService.add(p);                    
+                    Prendas newPrenda = prendaService.add(p);
                 }
             }
             promoService.delete(nombre);
@@ -86,24 +88,25 @@ public class PromocionesController {
         }
     }
 
-    
     @ApiOperation(value = "Aplica una promocion a una prenda")
     @ApiResponses(value = {
         @ApiResponse(code = 202, response = HttpResponse.class, message = "Promocion aplicada a la prenda"),
         @ApiResponse(code = 404, response = HttpResponse.class, message = "Prenda/promocion no encontrada")})
-    @PutMapping("/aplicar")    
+    @PutMapping("/aplicar")
     public ResponseEntity<?> applyPromo(@RequestParam(name = "promocion") String nombre, @RequestParam(name = "prenda") String referencia) {
         logger.info("APLICANDO PROMO");
-        Prendas pren = prendaService.findByReference(referencia);
-        if (pren != null) {
-            Promociones prom = promoService.findByName(nombre);
-            if (prom != null) {                
-                if (!pren.getPromocionesDePrendas().contains(prom)) {
-                    pren.getPromocionesDePrendas().add(prom);                    
-                    double precio = calculaPromos(pren);                    
-                    pren.setPrecio_promocionado(precio);                    
-                    prendaService.add(pren);                    
-                    return ResponseEntity.status(HttpStatus.ACCEPTED).body(pren);
+        HashMap<String, Object> prendasPromo = promoService.apply(nombre, referencia);
+        Optional<Prendas> prenOpt = (Optional) prendasPromo.get(referencia);
+        Optional<Promociones> promOpt = (Optional) prendasPromo.get(nombre);
+
+        if (prenOpt.isPresent()) {
+            if (promOpt.isPresent()) {
+                if (!prenOpt.get().getPromocionesDePrendas().contains(promOpt.get())) {
+                    prenOpt.get().getPromocionesDePrendas().add(promOpt.get());
+                    double precio = calculaPromos(prenOpt.get());
+                    prenOpt.get().setPrecio_promocionado(precio);
+                    prendaService.add(prenOpt.get());
+                    return ResponseEntity.status(HttpStatus.ACCEPTED).body(prenOpt.get());
                 }
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(new HttpResponse("PROMO YA APLICADA A LA PRENDA"));
             }
@@ -113,7 +116,6 @@ public class PromocionesController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HttpResponse("PRENDA NO ENCONTRADA"));
     }
 
-    
     @ApiOperation(value = "Desaplica una promocion a una prenda")
     @ApiResponses(value = {
         @ApiResponse(code = 202, response = HttpResponse.class, message = "Promocion desaplicada a la prenda"),
@@ -122,14 +124,16 @@ public class PromocionesController {
     @Operation(summary = "Desaplica una promoción a una prenda")
     public ResponseEntity<?> unapplyPromo(@RequestParam(name = "promocion") String nombre, @RequestParam(name = "prenda") String referencia) {
         logger.info("DESAPLICANDO PROMO");
-        Prendas pren = prendaService.findByReference(referencia);
-        if (pren != null) {
-            Promociones prom = promoService.findByName(nombre);
-            if (prom != null) {
-                pren.getPromocionesDePrendas().remove(prom);
-                pren.setPrecio_promocionado(calculaPromos(pren));
-                prendaService.add(pren);
-                return ResponseEntity.status(HttpStatus.ACCEPTED).body(pren);
+        HashMap<String, Object> prendasPromo = promoService.apply(nombre, referencia);
+        Optional<Prendas> prenOpt = (Optional) prendasPromo.get(referencia);
+        Optional<Promociones> promOpt = (Optional) prendasPromo.get(nombre);
+
+        if (prenOpt.isPresent()) {
+            if (promOpt.isPresent()) {
+                prenOpt.get().getPromocionesDePrendas().remove(promOpt.get());
+                prenOpt.get().setPrecio_promocionado(calculaPromos(prenOpt.get()));
+                prendaService.add(prenOpt.get());
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(prenOpt.get());
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HttpResponse("PROMO NO ENCONTRADA"));
         }
@@ -139,22 +143,32 @@ public class PromocionesController {
     private double calculaPromos(Prendas prenda) {
         double precioPrenda = prenda.getPrecio();
         double resultado = 0;
-        for (Promociones promo : prenda.getPromocionesDePrendas()) {
-            resultado = precioPrenda - (precioPrenda * (promo.getDescuento() / 100));
-        }        
+        if (prenda.getPromocionesDePrendas().isEmpty()) {
+            resultado = precioPrenda;
+        } else {
+            for (Promociones promo : prenda.getPromocionesDePrendas()) {
+                resultado = precioPrenda - (precioPrenda * (promo.getDescuento() / 100));
+            }
+        }
         return formato(resultado);
     }
 
     private double formato(double precio) {
-        BigDecimal bd = new BigDecimal(precio);
-        bd = bd.setScale(2, RoundingMode.HALF_UP);
-        return bd.doubleValue();
-        
+//        BigDecimal bd = new BigDecimal(precio);
+//        bd = bd.setScale(2, RoundingMode.HALF_UP);
+//        return bd.doubleValue();
+
 //        DecimalFormat df = new DecimalFormat("0.00");
 //        String prec=df.format(precio);
 //        String precSin=prec.replace(",",".");
 //        logger.info(precSin);
 //        double precioFormateado = Double.valueOf(precSin);
 //        return precioFormateado;
+        
+        
+        Double format = Math.round(precio*100.0)/100.0;
+        return format;
+
+
     }
 }

@@ -4,6 +4,7 @@ import com.jrj.pruebatecnica.entities.Promociones;
 import com.jrj.pruebatecnica.repositories.PrendasRepository;
 import com.jrj.pruebatecnica.repositories.PromocionesRepository;
 import com.jrj.pruebatecnica.services.PromocionesService;
+import java.util.HashMap;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,22 @@ public class PromocionesServiceJpaImpl implements PromocionesService {
             logger.info("NOT Found promocion");
             return null;
         }
+    }
+
+    @Override
+    public HashMap<String, Object> apply(String nombre, String referencia) {
+        HashMap<String,Object> prendasPromo=new HashMap<>();
+        prendasPromo.put(nombre,promoRepo.findById(nombre));
+        prendasPromo.put(referencia, prendasRepo.findById(referencia));        
+        return prendasPromo;        
+    }
+
+    @Override
+    public HashMap<String, Object> unapply(String nombre, String referencia) {
+        HashMap<String,Object> prendasPromo=new HashMap<>();
+        prendasPromo.put(nombre,promoRepo.findById(nombre));
+        prendasPromo.put(referencia, prendasRepo.findById(referencia));        
+        return prendasPromo; 
     }
 
 }
