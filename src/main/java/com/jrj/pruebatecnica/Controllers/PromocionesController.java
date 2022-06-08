@@ -149,6 +149,9 @@ public class PromocionesController {
             for (Promociones promo : prenda.getPromocionesDePrendas()) {
                 resultado = precioPrenda - (precioPrenda * (promo.getDescuento() / 100));
             }
+            if(resultado<0){
+                resultado=0;
+            }
         }
         return formato(resultado);
     }
