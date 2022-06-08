@@ -6,6 +6,9 @@ import com.jrj.pruebatecnica.entities.Promociones;
 import com.jrj.pruebatecnica.response.HttpResponse;
 import com.jrj.pruebatecnica.services.PrendasService;
 import com.jrj.pruebatecnica.services.PromocionesService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -38,6 +41,10 @@ public class PromocionesController {
     @Autowired
     private PrendasService prendaService;
 
+    @ApiOperation(value = "Crea una nueva promocion")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, response = HttpResponse.class, message = "Promocion creada correctamente"),
+        @ApiResponse(code = 400, response = HttpResponse.class, message = "Promocion no creada, datos mal formados")})
     @PostMapping(value = "")
     public ResponseEntity<Promociones> add(@RequestBody Promociones promo) {     
         logger.info("CREANDO PROMO");
@@ -55,6 +62,10 @@ public class PromocionesController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponse("DESCUENTO DE LA PROMOCION MAL FORMADO"));
     }
 
+    @ApiOperation(value = "Elimina una promocion")
+    @ApiResponses(value = {
+        @ApiResponse(code = 204, response = HttpResponse.class, message = "Promocion eliminada"),
+        @ApiResponse(code = 404, response = HttpResponse.class, message = "Promocion no encontrada")})
     @DeleteMapping(value = "/{nombre}")
     public ResponseEntity<?> delete(@PathVariable String nombre) {
         logger.info("BORRANDO PROMO");
@@ -75,8 +86,12 @@ public class PromocionesController {
         }
     }
 
-    @PutMapping("/aplicar")
-    @Operation(summary = "Aplica una promoción a una prenda")
+    
+    @ApiOperation(value = "Aplica una promocion a una prenda")
+    @ApiResponses(value = {
+        @ApiResponse(code = 202, response = HttpResponse.class, message = "Promocion aplicada a la prenda"),
+        @ApiResponse(code = 404, response = HttpResponse.class, message = "Prenda/promocion no encontrada")})
+    @PutMapping("/aplicar")    
     public ResponseEntity<?> applyPromo(@RequestParam(name = "promocion") String nombre, @RequestParam(name = "prenda") String referencia) {
         logger.info("APLICANDO PROMO");
         Prendas pren = prendaService.findByReference(referencia);
@@ -98,6 +113,11 @@ public class PromocionesController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HttpResponse("PRENDA NO ENCONTRADA"));
     }
 
+    
+    @ApiOperation(value = "Desaplica una promocion a una prenda")
+    @ApiResponses(value = {
+        @ApiResponse(code = 202, response = HttpResponse.class, message = "Promocion desaplicada a la prenda"),
+        @ApiResponse(code = 404, response = HttpResponse.class, message = "Prenda/promocion no encontrada")})
     @PutMapping("/desaplicar")
     @Operation(summary = "Desaplica una promoción a una prenda")
     public ResponseEntity<?> unapplyPromo(@RequestParam(name = "promocion") String nombre, @RequestParam(name = "prenda") String referencia) {
@@ -121,10 +141,7 @@ public class PromocionesController {
         double resultado = 0;
         for (Promociones promo : prenda.getPromocionesDePrendas()) {
             resultado = precioPrenda - (precioPrenda * (promo.getDescuento() / 100));
-        }
-        if (resultado <= 0) {
-            resultado = precioPrenda;
-        }
+        }        
         return formato(resultado);
     }
 

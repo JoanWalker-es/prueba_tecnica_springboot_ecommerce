@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.jrj.pruebatecnica.entities.Prendas;
 import com.jrj.pruebatecnica.response.HttpResponse;
 import com.jrj.pruebatecnica.services.PrendasService;
-import com.jrj.pruebatecnica.services.PromocionesService;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -36,15 +34,13 @@ public class PrendasController {
     private static final Logger logger = LoggerFactory.getLogger(PrendasController.class);
 
     @Autowired
-    private PrendasService prendasService;   
+    private PrendasService prendasService;
 
-
-//    @Operation(summary = "Crea una nueva prenda", description = "Devuelve la prenda creada con su precio promocional", responses = {
-//        @ApiResponse(responseCode = "200", description = "Successful operation"),
-//        @ApiResponse(responseCode = "400", description = "Invalid data"),
-//        @ApiResponse(responseCode = "409", description = "Already exists") })
+    @ApiOperation(value = "Crea una nueva prenda")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, response = HttpResponse.class, message = "Prenda creada correctamente"),
+        @ApiResponse(code = 400, response = HttpResponse.class, message = "Prenda no creada, datos mal formados")})
     @PostMapping(value = "")
-    @Operation(summary = "Crea una nueva prenda")
     public ResponseEntity<?> add(@RequestBody Prendas prenda) {
         logger.info("CREANDO UNA PRENDA");
         //S,M,L        
@@ -75,8 +71,11 @@ public class PrendasController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponse("EL VALOR DE CATEGORIA NO COINCIDE CON NINGUNO DE LOS ACEPTADOS"));
     }
 
-    @DeleteMapping(value = "/{referencia}")
-    @Operation(summary = "Elimina una prenda")
+    @ApiOperation(value = "Elimina una prenda")
+    @ApiResponses(value = {
+        @ApiResponse(code = 204, response = HttpResponse.class, message = "Prenda eliminada"),
+        @ApiResponse(code = 404, response = HttpResponse.class, message = "Prenda no encontrada")})
+    @DeleteMapping(value = "/{referencia}")    
     public ResponseEntity<?> delete(@PathVariable String referencia) {
         logger.info("BORRANDO UNA PRENDA");
         Prendas prenda = prendasService.findByReference(referencia);
@@ -90,16 +89,21 @@ public class PrendasController {
         }
     }
 
-    @GetMapping(value = "")
-    @Operation(summary = "Encuentra todas las prendas")
+    @ApiOperation(value = "Encuentra todas las prendas")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, response = HttpResponse.class, message = "Prendas recuperadas")})
+    @GetMapping(value = "")    
     public ResponseEntity<List<Prendas>> findAll() {
         List<Prendas> prendas = prendasService.findAll();
         logger.info(("PRENDAS ENCONTRADAS " + HttpStatus.OK.value()));
         return ResponseEntity.status(HttpStatus.OK).body(prendas);
     }
 
-    @GetMapping(value = "/{ref}")
-    @Operation(summary = "Encuentra una prenda por la referencia")
+    @ApiOperation(value = "Recupera una prenda por referencia")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, response = HttpResponse.class, message = "Prenda recuperada"),
+        @ApiResponse(code = 404, response = HttpResponse.class, message = "Prenda no encontrada")})
+    @GetMapping(value = "/{ref}")    
     public ResponseEntity<?> findByReference(@PathVariable String ref) {
         Prendas prenda = prendasService.findByReference(ref);
         if (prenda != null) {
@@ -112,16 +116,16 @@ public class PrendasController {
     }
 
     private double formato(double precio) {
-//        BigDecimal bd = new BigDecimal(precio);
-//        bd = bd.setScale(2, RoundingMode.HALF_UP);
-//        return bd.doubleValue();  
-        logger.info("DENTRO DEL FORMATER PRECIO");
-        DecimalFormat df = new DecimalFormat("0.00");
-        String prec=df.format(precio);
-        String precSin=prec.replace(",",".");
-        logger.info(precSin);
-        double precioFormateado = Double.valueOf(precSin);
-        return precioFormateado;
+        BigDecimal bd = new BigDecimal(precio);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();  
+//        logger.info("DENTRO DEL FORMATER PRECIO");
+//        DecimalFormat df = new DecimalFormat("0.00");
+//        String prec = df.format(precio);
+//        String precSin = prec.replace(",", ".");
+//        logger.info(precSin);
+//        double precioFormateado = Double.valueOf(precSin);
+//        return precioFormateado;
     }
 
 }
