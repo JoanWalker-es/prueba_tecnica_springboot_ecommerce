@@ -30,7 +30,7 @@ public class SwaggerConfig {
         return new ApiInfo("Ecommerce prueba técnica Hiberus", 
                 "Ecommerce Spring Boot JPA REST ", "1.0", 
                 "http://localhost:8080/licence", 
-                new Contact("JRJ ORG", "http://jrj.es", "juandelarubia@msn.com")
+                new Contact("Juan De la Rubia", "https://prueba-tecnica-hiberus.herokuapp.com/", "juandelarubia@msn.com")
                 , "LICENCE ", "http://localhost:8080/licence", Collections.emptyList());
     }
 }
