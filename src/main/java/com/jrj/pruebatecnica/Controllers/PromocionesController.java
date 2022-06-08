@@ -148,13 +148,14 @@ public class PromocionesController {
     }
 
     private double calculaPromos(Prendas prenda) {
-        double precioPrenda = prenda.getPrecio();
+        double precioPrendaPromo = prenda.getPrecio();
         double resultado = 0;
         if (prenda.getPromocionesDePrendas().isEmpty()) {
-            resultado = precioPrenda;
+            resultado = precioPrendaPromo;
         } else {
             for (Promociones promo : prenda.getPromocionesDePrendas()) {
-                resultado = precioPrenda - (precioPrenda * (promo.getDescuento() / 100));
+                resultado = precioPrendaPromo - (precioPrendaPromo * (promo.getDescuento() / 100));
+                precioPrendaPromo=resultado;
             }
             if(resultado<0){
                 resultado=0;
