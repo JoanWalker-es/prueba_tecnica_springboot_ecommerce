@@ -3,7 +3,6 @@ package com.jrj.pruebatecnica.Controllers;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.jrj.pruebatecnica.entities.Prendas;
 import com.jrj.pruebatecnica.response.HttpResponse;
-import com.jrj.pruebatecnica.response.PrendaResponse;
 import com.jrj.pruebatecnica.services.PrendasService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
