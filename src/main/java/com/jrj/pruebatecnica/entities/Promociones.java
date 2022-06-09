@@ -3,6 +3,7 @@ package com.jrj.pruebatecnica.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Entity;
@@ -16,7 +17,7 @@ public class Promociones implements Serializable{
     @ApiModelProperty(notes = "Nombre de la promocion", example = "BLACK FRIDAY", required = true)
     private String nombre;
     @ApiModelProperty(notes = "Descuento de la promocion", example = "10.00", required = true)
-    private double descuento;
+    private BigDecimal descuento;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "promocionesDePrendas")     
@@ -25,7 +26,7 @@ public class Promociones implements Serializable{
     public Promociones() {
     }
 
-    public Promociones(String nombre, double descuento) {
+    public Promociones(String nombre, BigDecimal descuento) {
         this.nombre = nombre;
         this.descuento = descuento;
     }
@@ -38,11 +39,11 @@ public class Promociones implements Serializable{
         this.nombre = nombre;
     }
 
-    public double getDescuento() {
+    public BigDecimal getDescuento() {
         return descuento;
     }
 
-    public void setDescuento(double descuento) {
+    public void setDescuento(BigDecimal descuento) {
         this.descuento = descuento;
     }
 

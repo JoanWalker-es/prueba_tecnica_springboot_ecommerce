@@ -110,7 +110,7 @@ public class PromocionesController {
             if (promOpt.isPresent()) {
                 if (!prenOpt.get().getPromocionesDePrendas().contains(promOpt.get())) {
                     prenOpt.get().getPromocionesDePrendas().add(promOpt.get());
-                    double precio = calculaPromos(prenOpt.get());
+                    BigDecimal precio = calculaPromos(prenOpt.get());
                     prenOpt.get().setPrecio_promocionado(precio);
                     prendaService.add(prenOpt.get());
                     return ResponseEntity.status(HttpStatus.ACCEPTED).body(prenOpt.get());
@@ -147,26 +147,26 @@ public class PromocionesController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HttpResponse("PRENDA NO ENCONTRADA"));
     }
 
-    private double calculaPromos(Prendas prenda) {
-        double precioPrendaPromo = prenda.getPrecio();
-        double resultado = 0;
+    private BigDecimal calculaPromos(Prendas prenda) {
+        BigDecimal precioPrendaPromo = prenda.getPrecio();
+        BigDecimal resultado=new BigDecimal(0);
         if (prenda.getPromocionesDePrendas().isEmpty()) {
             resultado = precioPrendaPromo;
         } else {
             for (Promociones promo : prenda.getPromocionesDePrendas()) {
-                resultado = precioPrendaPromo - (precioPrendaPromo * (promo.getDescuento() / 100));
+                resultado = precioPrendaPromo.subtract((precioPrendaPromo.multiply(promo.getDescuento().divide(new BigDecimal(100)))));
                 precioPrendaPromo=resultado;
             }
-            if(resultado<0){
-                resultado=0;
+            if(resultado.compareTo(new BigDecimal(0))<0){
+                resultado=new BigDecimal(0);;
             }
         }
         return formato(resultado);
     }
 
-    private double formato(double precio) {
-        BigDecimal bd = new BigDecimal(precio);
-        bd = bd.setScale(2, RoundingMode.HALF_UP);
-        return bd.doubleValue();
+    private BigDecimal formato(BigDecimal precio) {
+
+        precio = precio.setScale(2, RoundingMode.HALF_UP);
+        return precio;
     }
 }

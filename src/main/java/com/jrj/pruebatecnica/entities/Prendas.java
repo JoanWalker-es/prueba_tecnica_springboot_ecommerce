@@ -26,9 +26,9 @@ public class Prendas implements Serializable {
     @ApiModelProperty(notes = "Referencia de la prenda", example = "S123456789", required = true)     
     private String referencia;
     @ApiModelProperty(notes = "Precio de la prenda", example = "10.15", required = true)
-    private double precio;
+    private BigDecimal precio;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private double precio_promocionado;
+    private BigDecimal precio_promocionado;
 
     @Column(name = "Categorias")
     @ElementCollection(targetClass = Categoria.class)
@@ -50,7 +50,7 @@ public class Prendas implements Serializable {
     public Prendas() {
     }
 
-    public Prendas(String referencia, double precio, double precio_promocionado, Set<Categoria> categorias) {
+    public Prendas(String referencia, BigDecimal precio, BigDecimal precio_promocionado, Set<Categoria> categorias) {
         this.referencia = referencia;
         this.precio = precio;
         this.precio_promocionado = precio_promocionado;
@@ -65,22 +65,22 @@ public class Prendas implements Serializable {
         this.referencia = referencia;
     }
 
-    public double getPrecio() {
+    public BigDecimal getPrecio() {
 
         return precio;
     }
 
-    public void setPrecio(double precio) {
+    public void setPrecio(BigDecimal precio) {
         this.precio = precio;
     }
 
-    public double getPrecio_promocionado() {
+    public BigDecimal getPrecio_promocionado() {
 
         return precio_promocionado;
     }
     
     
-    public void setPrecio_promocionado(double precio_promocionado) {
+    public void setPrecio_promocionado(BigDecimal precio_promocionado) {
         this.precio_promocionado = precio_promocionado;
     }
 

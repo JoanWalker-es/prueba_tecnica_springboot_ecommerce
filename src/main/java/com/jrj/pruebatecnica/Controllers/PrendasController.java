@@ -3,6 +3,7 @@ package com.jrj.pruebatecnica.Controllers;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.jrj.pruebatecnica.entities.Prendas;
 import com.jrj.pruebatecnica.response.HttpResponse;
+import com.jrj.pruebatecnica.response.PrendaResponse;
 import com.jrj.pruebatecnica.services.PrendasService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -46,8 +47,8 @@ public class PrendasController {
         Pattern pat = Pattern.compile("^[S,M,L]{1}[a-zA-Z0-9]{9}");
         Matcher mat = pat.matcher(prenda.getReferencia());
         if (mat.matches()) {
-            prenda.setPrecio(prenda.getPrecio());
-            prenda.setPrecio_promocionado(prenda.getPrecio());
+            prenda.setPrecio(formato(prenda.getPrecio()));
+            prenda.setPrecio_promocionado(formato(prenda.getPrecio()));
             Prendas newPrenda = prendasService.add(prenda);
             if (newPrenda != null) {
                 logger.info("PRENDA CREADA " + HttpStatus.CREATED.value());
@@ -112,10 +113,9 @@ public class PrendasController {
         }
     }
 
-    private double formato(double precio) {
-        BigDecimal bd = new BigDecimal(precio);
+    private BigDecimal formato(BigDecimal bd) {
         bd = bd.setScale(2, RoundingMode.HALF_UP);
-        return bd.doubleValue();
+        return bd;
     }
 
 }
