@@ -51,6 +51,7 @@ public class PromocionesController {
     @PostMapping(value = "")
     public ResponseEntity<Promociones> add(@RequestBody Promociones promo) {
         logger.info("CREANDO PROMO");
+        promo.setDescuento(formato(promo.getDescuento()));
         Promociones promos = promoService.add(promo);
         if (promos != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(promos);
@@ -105,7 +106,6 @@ public class PromocionesController {
         HashMap<String, Object> prendasPromo = promoService.apply(nombre, referencia);
         Optional<Prendas> prenOpt = (Optional) prendasPromo.get(referencia);
         Optional<Promociones> promOpt = (Optional) prendasPromo.get(nombre);
-
         if (prenOpt.isPresent()) {
             if (promOpt.isPresent()) {
                 if (!prenOpt.get().getPromocionesDePrendas().contains(promOpt.get())) {
@@ -131,10 +131,9 @@ public class PromocionesController {
     @Operation(summary = "Desaplica una promoción a una prenda")
     public ResponseEntity<?> unapplyPromo(@RequestParam(name = "promocion") String nombre, @RequestParam(name = "prenda") String referencia) {
         logger.info("DESAPLICANDO PROMO");
-        HashMap<String, Object> prendasPromo = promoService.apply(nombre, referencia);
+        HashMap<String, Object> prendasPromo = promoService.unapply(nombre, referencia);
         Optional<Prendas> prenOpt = (Optional) prendasPromo.get(referencia);
         Optional<Promociones> promOpt = (Optional) prendasPromo.get(nombre);
-
         if (prenOpt.isPresent()) {
             if (promOpt.isPresent()) {
                 prenOpt.get().getPromocionesDePrendas().remove(promOpt.get());
@@ -165,7 +164,6 @@ public class PromocionesController {
     }
 
     private BigDecimal formato(BigDecimal precio) {
-
         precio = precio.setScale(2, RoundingMode.HALF_UP);
         return precio;
     }
